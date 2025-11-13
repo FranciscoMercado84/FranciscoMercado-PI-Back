@@ -345,7 +345,3 @@ npm start     # para arranque normal
 
 ---
 
-Si quieres, puedo generar también `index.js` de arranque, un `.gitignore` y un `.env.example` en la carpeta `panaderia-backend`. Dime si lo añado ahora.
-
----
-

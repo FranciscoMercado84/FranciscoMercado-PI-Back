@@ -11,6 +11,27 @@ Proyecto backend con: Node.js, Express, Sequelize y MySQL.
 
 ---
 
+## 📐 Diseño y Modelado del Sistema
+
+Este proyecto incluye diagramas de arquitectura y modelado que documentan la estructura del sistema:
+
+### Diagramas disponibles
+
+1. **[Diagrama de Vista Global](./docs/diagramas/DiagramaVistaGlobal.png)** - Vista general de la arquitectura del sistema, mostrando la interacción entre frontend, backend y base de datos.
+
+2. **[Diagrama de Componentes](./docs/diagramas/DiagramaDeComponentes.png)** - Detalle de los componentes principales del backend (controladores, servicios, modelos, middlewares) y sus relaciones.
+
+3. **[Diagrama Entidad-Interrelación (ER)](./docs/diagramas/DiagramaIE.png)** - Modelo de datos con entidades, atributos y relaciones de la base de datos MySQL.
+
+**Ubicación**: Todos los diagramas se encuentran en `panaderia-backend/docs/diagramas/`
+
+Para más detalles sobre la API REST, consulta:
+- [Convenciones API](./docs/api/conventions.md)
+- [Especificación OpenAPI](./docs/api/openapi.yaml)
+- [Guía de errores](./docs/api/errors.md)
+
+---
+
 ## Requisitos previos
 
 - Node.js (versión 14+ recomendada) y npm instalados.

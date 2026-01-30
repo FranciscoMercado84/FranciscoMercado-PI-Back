@@ -1,5 +1,4 @@
 import routes from '../routes/index.js';
-import swaggerSpec from '../config/swagger.js';
 import swaggerUi from 'swagger-ui-express';
 import logger from '../config/logger.js';
 
@@ -8,7 +7,7 @@ import logger from '../config/logger.js';
  */
 export const routesLoader = (app) => {
   // Swagger Documentation
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup());
 
   // Health check endpoint
   app.get('/health', (req, res) => {

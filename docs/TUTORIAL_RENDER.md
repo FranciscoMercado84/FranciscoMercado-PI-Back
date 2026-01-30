@@ -134,12 +134,12 @@ Click en "Advanced" o espera a que se cree el servicio y ve a "Environment":
 | `NODE_ENV` | `production` | Entorno de ejecución |
 | `PORT` | `10000` | Puerto (Render lo asigna automáticamente) |
 | `MONGODB_URI` | `mongodb+srv://...` | **Pega tu URL de MongoDB Atlas** |
-| `JWT_SECRET` | (genera uno) | Secreto para tokens (ver abajo) |
+| `JWT_SECRET` | 6dac3d1e9b270bb2b074fe31868dc40a459e59227cf83617754985e0ad8d6b0a98ece7e7c7209760e74b58fdcc00a88c0edb4b7c5ea7ccdda95ce0cc9c031f53 | Secreto para tokens |
 | `JWT_EXPIRATION` | `7d` | Duración del token principal |
-| `JWT_REFRESH_SECRET` | (genera otro) | Secreto para refresh tokens |
+| `JWT_REFRESH_SECRET` | e7280aa67ae2ab425b149ead63ab29b99807936898037b16d64e8cfaae9ea898be91270a5a3de2c12069ed465433483be224db2b700d411a7f38534a8e8320ad | Secreto para refresh tokens |
 | `JWT_REFRESH_EXPIRATION` | `30d` | Duración del refresh token |
 | `ADMIN_EMAIL` | `admin@panaderia.com` | Email del administrador |
-| `ADMIN_PASSWORD` | (genera uno) | Contraseña del admin (ver abajo) |
+| `ADMIN_PASSWORD` | i0GzLZCeNiQVbOucaqWSCeE+pio= | Contraseña del admin |
 
 **Generar secretos seguros**:
 

@@ -1,0 +1,352 @@
+openapi: 3.0.3
+info:
+  title: Panadería El Sabor Artesano - API
+  description: |
+    API REST v1 para la tienda online y panel de gestión de "Panadería El Sabor Artesano".
+    
+    ## Autenticación
+    
+    Esta API usa **JWT Bearer Token** para proteger los endpoints.
+    
+    ### Pasos para autenticarse:
+    1. Registrate con `POST /api/auth/register` o usa las credenciales admin
+    2. Usa `POST /api/auth/login` con tus credenciales
+    3. Copia el **access_token** de la respuesta
+    4. Haz clic en el botón **"Authorize"** 🔓 arriba
+    5. Pega el token (sin "Bearer ", solo el token)
+    6. Haz clic en **"Authorize"** y luego **"Close"**
+    
+    Credenciales de administrador por defecto:
+    - Email: admin@panaderia.com
+    - Password: admin123
+    
+  version: "1.0.0"
+  contact:
+    name: Francisco Mercado
+    email: admin@panaderia.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo local
+  - url: https://api.panaderia.com/api
+    description: Servidor de producción
+
+tags:
+  - name: Health
+    description: Endpoints de salud y estado del sistema
+  - name: Auth
+    description: Autenticación y autorización
+  - name: Categories
+    description: Gestión de categorías de productos
+  - name: Products
+    description: Gestión de productos de la panadería
+  - name: Cart
+    description: Gestión del carrito de compras
+  - name: Orders
+    description: Gestión de pedidos
+  - name: Admin
+    description: Endpoints administrativos
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtenido del endpoint POST /api/auth/login
+
+  responses:
+    UnauthorizedError:
+      description: Token no proporcionado o inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            code: UNAUTHORIZED
+            message: Token de autenticación inválido o expirado
+    
+    ForbiddenError:
+      description: Sin permisos suficientes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            code: FORBIDDEN
+            message: No tienes permisos para realizar esta acción
+    
+    NotFoundError:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            code: NOT_FOUND
+            message: El recurso solicitado no existe
+    
+    ValidationError:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+          example:
+            success: false
+            code: VALIDATION_ERROR
+            message: Error de validación en los datos enviados
+            details:
+              - field: email
+                issue: El email no es válido
+
+  schemas:
+    # Error schemas
+    Error:
+      type: object
+      required:
+        - success
+        - code
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        code:
+          type: string
+          example: ERROR_CODE
+        message:
+          type: string
+          example: Mensaje de error descriptivo
+    
+    ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          properties:
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  issue:
+                    type: string
+
+    # Pagination
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 125
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        pages:
+          type: integer
+          example: 7
+
+    # Auth schemas
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@panaderia.com
+        password:
+          type: string
+          format: password
+          example: admin123
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: Juan Pérez
+        email:
+          type: string
+          format: email
+          example: juan@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+        phone:
+          type: string
+          example: "666123456"
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: string
+          example: 24h
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        name:
+          type: string
+          example: Juan Pérez
+        email:
+          type: string
+          format: email
+          example: juan@example.com
+        role:
+          type: string
+          enum: [admin, client]
+          example: client
+        phone:
+          type: string
+          example: "666123456"
+        created_at:
+          type: string
+          format: date-time
+          example: 2025-11-12T10:00:00Z
+
+paths:
+  /:
+    get:
+      summary: Información de la API
+      description: Devuelve información general de la API y sus endpoints disponibles
+      tags: [Health]
+      responses:
+        '200':
+          description: Información de la API
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: API Panadería El Sabor Artesano v1.0
+                  endpoints:
+                    type: object
+                  documentation:
+                    type: string
+                    example: /api-docs
+                  authentication:
+                    type: string
+                    example: Use Bearer token in Authorization header
+
+  /auth/register:
+    post:
+      summary: Registrar nuevo cliente
+      description: Crea una nueva cuenta de cliente
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Usuario registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                code: CONFLICT
+                message: El email ya está registrado
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      description: Autentica un usuario y devuelve un token JWT
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                code: UNAUTHORIZED
+                message: Email o contraseña incorrectos
+
+  /auth/me:
+    get:
+      summary: Obtener usuario autenticado
+      description: Devuelve la información del usuario actual
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Información del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+# TODO: Agregar endpoints de Categories, Products, Cart, Orders
+# Seguir el formato de docs/api/openapi.yaml para los endpoints completos

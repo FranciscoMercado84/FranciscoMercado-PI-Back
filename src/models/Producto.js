@@ -23,8 +23,19 @@ const productoSchema = new mongoose.Schema({
     default: '/images/default-pan.jpg'
   },
   categoria: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Categoria',
+    type: String,
+    enum: {
+      values: [
+        'Despensa y básicos',
+        'Conservas y Enlatados',
+        'Aceites, Vinagres y Salsas',
+        'Bebidas y Bodega',
+        'Charcutería',
+        'Dulces',
+        'Panadería'
+      ],
+      message: '{VALUE} no es una categoría válida'
+    },
     required: [true, 'La categoría es obligatoria']
   },
   disponible: {

@@ -13,7 +13,9 @@
     "test:report": "npx sonar-scanner",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "migrate:categorias": "node scripts/migrate-categorias.js",
+    "drop:categorias": "node scripts/drop-categorias-collection.js"
   },
   "author": "Paco",
   "license": "ISC",

@@ -178,24 +178,6 @@ Abre en tu navegador: `http://localhost:3000/api-docs`
 
 ---
 
-## 🚀 Despliegue
-
-### Despliegue Recomendado: Render
-
-Para desplegar en **Render** (gratis con MongoDB Atlas), sigue el **[Tutorial Completo de Render](docs/TUTORIAL_RENDER.md)**.
-
-El tutorial incluye:
-- ✅ Configuración de MongoDB Atlas (gratis)
-- ✅ Despliegue paso a paso en Render
-- ✅ Configuración de variables de entorno
-- ✅ Verificación y troubleshooting
-- ✅ Gestión post-despliegue
-
-### Otras Opciones
-
-Para Railway, Vercel u otras plataformas, consulta la [Guía de Despliegue](docs/DEPLOYMENT.md).
-
----
 
 ## 📜 Scripts Disponibles
 
@@ -204,8 +186,9 @@ Para Railway, Vercel u otras plataformas, consulta la [Guía de Despliegue](docs
 | **Desarrollo** | `npm run dev` | Inicia el servidor con hot-reload (watch mode) |
 | **Producción** | `npm start` | Inicia el servidor en modo producción |
 | **Tests** | `npm test` | Ejecuta todos los tests con Vitest |
-| **Coverage** | `npm run coverage` | Genera reporte de cobertura de tests |
+| **Coverage** | `npm run test:coverage` | Genera reporte de cobertura de tests |
 | **Lint** | `npm run lint` | Ejecuta ESLint para verificar código |
+| **Lint Fix** | `npm run lint:fix` | Corrige automáticamente problemas de ESLint |
 | **Seed** | `npm run seed` | Pobla la base de datos con datos de prueba |
 
 ---
@@ -219,7 +202,7 @@ panaderia-backend/
 │   ├── controllers/     # Controladores (lógica de endpoints)
 │   ├── loaders/         # Inicializadores (middleware, routes)
 │   ├── middlewares/     # Middlewares personalizados
-│   ├── models/          # Modelos Mongoose (User, Product, etc.)
+│   ├── models/          # Modelos Mongoose (Usuario, Producto, Carrito, Pedido)
 │   ├── routes/          # Definición de rutas
 │   ├── services/        # Lógica de negocio
 │   ├── utils/           # Utilidades y helpers
@@ -228,9 +211,7 @@ panaderia-backend/
 ├── docs/
 │   ├── api/             # Documentación API (OpenAPI, Swagger)
 │   ├── diagramas/       # Diagramas de arquitectura
-│   ├── DEPLOYMENT.md    # Guía de despliegue multi-plataforma
-│   └── TUTORIAL_RENDER.md  # Tutorial específico de Render
-├── scripts/             # Scripts de utilidad (seed, etc.)
+├── scripts/             # Scripts de utilidad (seed, migrate, etc.)
 ├── logs/                # Logs de Winston (no versionados)
 ├── postman/             # Colecciones Postman para testing
 ├── .env                 # Variables de entorno (NO versionar)
@@ -239,6 +220,57 @@ panaderia-backend/
 ├── render.yaml          # Configuración de Render
 └── README.md            # Este archivo
 ```
+
+---
+
+## 📊 Modelo de Datos
+
+### Categorías de Productos
+
+Las categorías se implementan como **enum de strings** para mayor simplicidad y rendimiento:
+
+```javascript
+enum CategoriaProducto {
+  'Despensa y básicos',
+  'Conservas y Enlatados',
+  'Aceites, Vinagres y Salsas',
+  'Bebidas y Bodega',
+  'Charcutería',
+  'Dulces',
+  'Panadería'
+}
+```
+
+### Modelos Principales
+
+#### Usuario
+- Campos: nombre, email, password (hash), rol (cliente/admin), teléfono, dirección
+- Autenticación con JWT
+- Roles: `cliente` y `admin`
+
+#### Producto
+- **Categoría como String enum** (no referencia a colección)
+- Campos: nombre, descripción, precio, imagen_url, categoría, disponible, peso, ingredientes, alérgenos, destacado
+- Validación automática de categoría por Mongoose
+
+#### Carrito
+- Vinculado a usuario autenticado
+- Items con populate automático de productos
+- Cálculo automático de subtotales y total
+
+#### Pedido
+- Número de pedido único auto-generado
+- Estados: pendiente, en_preparacion, listo, enviado, entregado, cancelado
+- Snapshot de productos al momento del pedido
+
+### Ventajas de Categorías como Enum
+
+✅ **Rendimiento**: 1 query en lugar de 2 (sin populate)  
+✅ **Simplicidad**: Sin joins ni referencias  
+✅ **Validación**: Mongoose valida automáticamente valores permitidos  
+✅ **Menor espacio**: Strings vs ObjectIds  
+
+Para más detalles sobre la migración de categorías, consulta [MIGRACION_CATEGORIAS.md](docs/MIGRACION_CATEGORIAS.md).
 
 ---
 

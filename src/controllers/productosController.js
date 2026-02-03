@@ -20,7 +20,6 @@ export const getAll = asyncHandler(async (req, res) => {
 
   const [productos, total] = await Promise.all([
     Producto.find(filter)
-      .populate('categoria', 'nombre slug')
       .skip(skip)
       .limit(limit)
       .sort({ destacado: -1, createdAt: -1 }),
@@ -39,8 +38,7 @@ export const getAll = asyncHandler(async (req, res) => {
 });
 
 export const getById = asyncHandler(async (req, res) => {
-  const producto = await Producto.findById(req.params.id)
-    .populate('categoria', 'nombre descripcion slug');
+  const producto = await Producto.findById(req.params.id);
 
   if (!producto) {
     return res.status(404).json({
@@ -54,7 +52,6 @@ export const getById = asyncHandler(async (req, res) => {
 
 export const create = asyncHandler(async (req, res) => {
   const producto = await Producto.create(req.body);
-  await producto.populate('categoria');
 
   res.status(201).json({ data: producto });
 });
@@ -64,7 +61,7 @@ export const update = asyncHandler(async (req, res) => {
     req.params.id,
     req.body,
     { new: true, runValidators: true }
-  ).populate('categoria');
+  );
 
   if (!producto) {
     return res.status(404).json({

@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { connectDB } from '../src/config/database.js';
-import { Usuario, Categoria, Producto } from '../src/models/index.js';
+import { Usuario, Producto } from '../src/models/index.js';
 
 const seedDatabase = async () => {
   try {
@@ -13,7 +13,6 @@ const seedDatabase = async () => {
     // Limpiar BD
     await Promise.all([
       Usuario.deleteMany({}),
-      Categoria.deleteMany({}),
       Producto.deleteMany({})
     ]);
 
@@ -40,29 +39,16 @@ const seedDatabase = async () => {
 
     console.log('✅ Usuarios creados');
 
-    // Categorías basadas en Polvillo
-    console.log('📁 Creando categorías...');
-    const categorias = await Categoria.create([
-      { nombre: 'Tradicionales', descripcion: 'Pan tradicional artesanal', orden: 1 },
-      { nombre: 'Barras y Andaluzas', descripcion: 'Barras y vienas andaluzas', orden: 2 },
-      { nombre: 'Panes de Salud', descripcion: 'Pan con cereales y semillas', orden: 3 },
-      { nombre: 'Integrales 100%', descripcion: 'Panes integrales', orden: 4 },
-      { nombre: 'Molletes', descripcion: 'Molletes tradicionales', orden: 5 },
-      { nombre: 'Baguettes', descripcion: 'Baguettes y derivados', orden: 6 }
-    ]);
-
-    console.log('✅ Categorías creadas');
-
-    // Productos reales de Polvillo
-    console.log('🍞 Creando productos Polvillo...');
+    // Productos con nuevas categorías enum
+    console.log('🍞 Creando productos...');
     const productos = await Producto.create([
-      // TRADICIONALES
+      // PANADERÍA
       {
         nombre: 'Barra Campesina',
         descripcion: 'Pan tradicional de corteza crujiente y miga esponjosa',
         precio: 1.20,
         imagen_url: '/images/barra-campesina.jpg',
-        categoria: categorias[0]._id,
+        categoria: 'Panadería',
         peso: 250,
         ingredientes: 'Harina de trigo, agua, sal, levadura',
         alergenos: ['gluten'],
@@ -73,182 +59,188 @@ const seedDatabase = async () => {
         descripcion: 'Pan artesanal de elaboración tradicional',
         precio: 2.10,
         imagen_url: '/images/panvillo-tradicional.jpg',
-        categoria: categorias[0]._id,
+        categoria: 'Panadería',
         peso: 500,
         ingredientes: 'Harina de trigo, agua, sal, levadura',
         alergenos: ['gluten']
       },
       {
-        nombre: 'Rombo Restaurante',
-        descripcion: 'Pan ideal para restaurantes',
-        precio: 0.90,
-        imagen_url: '/images/rombo.jpg',
-        categoria: categorias[0]._id,
-        peso: 150,
-        alergenos: ['gluten']
-      },
-
-      // BARRAS Y ANDALUZAS
-      {
         nombre: 'Barra Parisienne',
         descripcion: 'Barra al estilo parisino',
         precio: 0.85,
         imagen_url: '/images/barra-parisienne.jpg',
-        categoria: categorias[1]._id,
+        categoria: 'Panadería',
         peso: 180,
         alergenos: ['gluten'],
         destacado: true
       },
       {
-        nombre: 'Viena Andaluza',
-        descripcion: 'Tradicional viena andaluza',
-        precio: 0.75,
-        imagen_url: '/images/viena-andaluza.jpg',
-        categoria: categorias[1]._id,
-        peso: 200,
-        alergenos: ['gluten']
-      },
-      {
-        nombre: 'Barra Gourmet',
-        descripcion: 'Barra premium de masa madre',
-        precio: 1.50,
-        imagen_url: '/images/barra-gourmet.jpg',
-        categoria: categorias[1]._id,
-        peso: 300,
-        alergenos: ['gluten'],
-        destacado: true
-      },
-
-      // PANES DE SALUD
-      {
-        nombre: 'Chapata 5 Cereales',
-        descripcion: 'Pan con 5 cereales diferentes',
-        precio: 2.30,
-        imagen_url: '/images/chapata-5cereales.jpg',
-        categoria: categorias[2]._id,
-        peso: 400,
-        ingredientes: 'Trigo, centeno, avena, cebada, maíz, agua, sal, levadura',
-        alergenos: ['gluten'],
-        destacado: true
-      },
-      {
-        nombre: 'Panvillo Quinoa',
-        descripcion: 'Pan artesanal con quinoa',
-        precio: 2.80,
-        imagen_url: '/images/panvillo-quinoa.jpg',
-        categoria: categorias[2]._id,
-        peso: 500,
-        alergenos: ['gluten']
-      },
-      {
-        nombre: 'Panvillo Lino',
-        descripcion: 'Pan con semillas de lino',
-        precio: 2.50,
-        imagen_url: '/images/panvillo-lino.jpg',
-        categoria: categorias[2]._id,
-        peso: 500,
-        alergenos: ['gluten', 'semillas de lino']
-      },
-      {
-        nombre: 'Panvillo Pasas y Nueces',
-        descripcion: 'Pan con pasas y nueces',
-        precio: 3.20,
-        imagen_url: '/images/panvillo-pasas-nueces.jpg',
-        categoria: categorias[2]._id,
-        peso: 500,
-        alergenos: ['gluten', 'frutos secos']
-      },
-
-      // INTEGRALES 100%
-      {
-        nombre: 'Mollete Integral 100%',
-        descripcion: 'Mollete 100% integral',
-        precio: 1.80,
-        imagen_url: '/images/mollete-integral.jpg',
-        categoria: categorias[3]._id,
-        peso: 300,
-        alergenos: ['gluten']
-      },
-      {
-        nombre: 'Hogaza Integral',
-        descripcion: 'Hogaza 100% integral',
-        precio: 3.50,
-        imagen_url: '/images/hogaza-integral.jpg',
-        categoria: categorias[3]._id,
-        peso: 800,
-        alergenos: ['gluten'],
-        destacado: true
-      },
-      {
-        nombre: 'Romanito Integral',
-        descripcion: 'Pan romano integral',
-        precio: 1.20,
-        imagen_url: '/images/romanito-integral.jpg',
-        categoria: categorias[3]._id,
-        peso: 200,
-        alergenos: ['gluten']
-      },
-
-      // MOLLETES
-      {
         nombre: 'Mollete Clásico',
         descripcion: 'El auténtico mollete andaluz',
         precio: 0.60,
         imagen_url: '/images/mollete-clasico.jpg',
-        categoria: categorias[4]._id,
+        categoria: 'Panadería',
         peso: 100,
         alergenos: ['gluten'],
         destacado: true
       },
       {
-        nombre: 'Mollete Campero',
-        descripcion: 'Mollete de masa campera',
-        precio: 0.70,
-        imagen_url: '/images/mollete-campero.jpg',
-        categoria: categorias[4]._id,
-        peso: 120,
+        nombre: 'Baguette Tradicional',
+        descripcion: 'Baguette francesa tradicional',
+        precio: 1.10,
+        imagen_url: '/images/baguette.jpg',
+        categoria: 'Panadería',
+        peso: 250,
         alergenos: ['gluten']
       },
 
-      // BAGUETTES
+      // DULCES
       {
-        nombre: 'Baguette',
-        descripcion: 'Baguette tradicional francesa',
-        precio: 1.10,
-        imagen_url: '/images/baguette.jpg',
-        categoria: categorias[5]._id,
-        peso: 250,
-        alergenos: ['gluten'],
+        nombre: 'Croissant de Mantequilla',
+        descripcion: 'Croissant artesanal con mantequilla',
+        precio: 1.80,
+        imagen_url: '/images/croissant.jpg',
+        categoria: 'Dulces',
+        peso: 80,
+        ingredientes: 'Harina, mantequilla, azúcar, levadura',
+        alergenos: ['gluten', 'lácteos'],
         destacado: true
       },
       {
-        nombre: 'Baguettina',
-        descripcion: 'Baguette pequeña',
-        precio: 0.65,
-        imagen_url: '/images/baguettina.jpg',
-        categoria: categorias[5]._id,
-        peso: 125,
+        nombre: 'Palmera de Chocolate',
+        descripcion: 'Palmera de hojaldre con chocolate',
+        precio: 1.50,
+        imagen_url: '/images/palmera-chocolate.jpg',
+        categoria: 'Dulces',
+        peso: 100,
+        alergenos: ['gluten', 'lácteos']
+      },
+      {
+        nombre: 'Napolitana',
+        descripcion: 'Napolitana de chocolate',
+        precio: 1.40,
+        imagen_url: '/images/napolitana.jpg',
+        categoria: 'Dulces',
+        peso: 90,
+        alergenos: ['gluten', 'lácteos']
+      },
+
+      // CONSERVAS Y ENLATADOS
+      {
+        nombre: 'Atún en Aceite de Oliva',
+        descripcion: 'Lata de atún en aceite de oliva virgen extra',
+        precio: 2.50,
+        imagen_url: '/images/atun.jpg',
+        categoria: 'Conservas y Enlatados',
+        peso: 150,
+        ingredientes: 'Atún, aceite de oliva, sal',
+        alergenos: ['pescado']
+      },
+      {
+        nombre: 'Tomate Frito Casero',
+        descripcion: 'Tomate frito casero en conserva',
+        precio: 1.80,
+        imagen_url: '/images/tomate-frito.jpg',
+        categoria: 'Conservas y Enlatados',
+        peso: 400,
+        ingredientes: 'Tomate, aceite de oliva, sal, azúcar'
+      },
+
+      // ACEITES, VINAGRES Y SALSAS
+      {
+        nombre: 'Aceite de Oliva Virgen Extra',
+        descripcion: 'Aceite de oliva virgen extra primera prensada',
+        precio: 8.50,
+        imagen_url: '/images/aceite-oliva.jpg',
+        categoria: 'Aceites, Vinagres y Salsas',
+        peso: 750,
+        destacado: true
+      },
+      {
+        nombre: 'Vinagre de Jerez',
+        descripcion: 'Vinagre de Jerez con denominación de origen',
+        precio: 3.50,
+        imagen_url: '/images/vinagre-jerez.jpg',
+        categoria: 'Aceites, Vinagres y Salsas',
+        peso: 500
+      },
+
+      // CHARCUTERÍA
+      {
+        nombre: 'Jamón Serrano Loncheado',
+        descripcion: 'Jamón serrano loncheado al vacío',
+        precio: 4.50,
+        imagen_url: '/images/jamon-serrano.jpg',
+        categoria: 'Charcutería',
+        peso: 100,
+        ingredientes: 'Jamón de cerdo, sal'
+      },
+      {
+        nombre: 'Chorizo Ibérico',
+        descripcion: 'Chorizo ibérico de bellota',
+        precio: 6.80,
+        imagen_url: '/images/chorizo.jpg',
+        categoria: 'Charcutería',
+        peso: 200,
+        ingredientes: 'Carne de cerdo ibérico, pimentón, sal, ajo',
+        destacado: true
+      },
+
+      // BEBIDAS Y BODEGA
+      {
+        nombre: 'Agua Mineral Natural',
+        descripcion: 'Agua mineral natural 1.5L',
+        precio: 0.80,
+        imagen_url: '/images/agua.jpg',
+        categoria: 'Bebidas y Bodega',
+        peso: 1500
+      },
+      {
+        nombre: 'Vino Tinto Crianza',
+        descripcion: 'Vino tinto crianza D.O. Rioja',
+        precio: 8.90,
+        imagen_url: '/images/vino-tinto.jpg',
+        categoria: 'Bebidas y Bodega',
+        peso: 750,
+        destacado: true
+      },
+
+      // DESPENSA Y BÁSICOS
+      {
+        nombre: 'Arroz Extra',
+        descripcion: 'Arroz redondo de grano extra',
+        precio: 2.20,
+        imagen_url: '/images/arroz.jpg',
+        categoria: 'Despensa y básicos',
+        peso: 1000
+      },
+      {
+        nombre: 'Pasta Espaguetis',
+        descripcion: 'Espaguetis nº5 de sémola de trigo duro',
+        precio: 1.50,
+        imagen_url: '/images/espaguetis.jpg',
+        categoria: 'Despensa y básicos',
+        peso: 500,
         alergenos: ['gluten']
       },
       {
-        nombre: 'Bastón Rústico',
-        descripcion: 'Baguette rústica de masa madre',
-        precio: 1.80,
-        imagen_url: '/images/baston-rustico.jpg',
-        categoria: categorias[5]._id,
-        peso: 350,
-        alergenos: ['gluten']
+        nombre: 'Sal Marina',
+        descripcion: 'Sal marina fina',
+        precio: 0.90,
+        imagen_url: '/images/sal.jpg',
+        categoria: 'Despensa y básicos',
+        peso: 1000
       }
     ]);
 
-    console.log('✅ Productos Polvillo creados');
+    console.log('✅ Productos creados');
     console.log(`\n🎉 Seeds completados!\n`);
     console.log('📧 Credenciales:');
     console.log('   Admin: admin@panaderia.com / admin123');
     console.log('   Cliente: cliente@test.com / test123');
     console.log(`\n📊 Resumen:`);
     console.log(`   ${usuarios.length} usuarios`);
-    console.log(`   ${categorias.length} categorías`);
+    console.log(`   7 categorías (enum)`);
     console.log(`   ${productos.length} productos\n`);
 
     process.exit(0);

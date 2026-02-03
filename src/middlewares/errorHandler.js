@@ -62,42 +62,42 @@ export const notFoundHandler = (req, res, next) => {
  */
 // eslint-disable-next-line no-unused-vars
 export const errorHandler = (err, req, res, next) => {
-  let error = err;
+  console.error('ERROR:', err);
 
-  // Si no es un ApiError, lo convertimos
-  if (!(error instanceof ApiError)) {
-    const statusCode = error.statusCode || 500;
-    const message = error.message || 'Error interno del servidor';
-    error = new ApiError(statusCode, message, false);
-  }
-
-  // Log del error
-  if (error.statusCode >= 500) {
-    logger.error(`${error.message}`, {
-      statusCode: error.statusCode,
-      path: req.path,
-      method: req.method,
-      stack: err.stack,
-    });
-  } else {
-    logger.warn(`${error.message}`, {
-      statusCode: error.statusCode,
-      path: req.path,
-      method: req.method,
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    const errors = Object.values(err.errors).map(e => ({
+      field: e.path,
+      message: e.message
+    }));
+    return res.status(400).json({
+      code: 'VALIDATION_ERROR',
+      message: 'Error de validación',
+      details: errors
     });
   }
 
-  // Respuesta al cliente
-  const response = {
-    success: false,
-    status: error.status,
-    message: error.message,
-  };
-
-  // En desarrollo incluimos el stack trace
-  if (process.env.NODE_ENV === 'development') {
-    response.stack = err.stack;
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyPattern)[0];
+    return res.status(400).json({
+      code: 'DUPLICATE_FIELD',
+      message: `El ${field} ya existe`
+    });
   }
 
-  res.status(error.statusCode).json(response);
+  // Mongoose CastError
+  if (err.name === 'CastError') {
+    return res.status(400).json({
+      code: 'INVALID_ID',
+      message: 'ID inválido'
+    });
+  }
+
+  // Error por defecto
+  res.status(err.statusCode || 500).json({
+    code: err.code || 'INTERNAL_ERROR',
+    message: err.message || 'Error interno del servidor',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
 };

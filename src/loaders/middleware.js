@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import logger from '../config/logger.js';
+import { config } from '../config/index.js';
 
 /**
  * Middleware loader - Inicializa todos los middlewares de Express
@@ -13,7 +13,7 @@ export const middlewareLoader = (app) => {
   
   // CORS
   app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: config.frontend.url,
     credentials: true,
   }));
 
@@ -22,12 +22,9 @@ export const middlewareLoader = (app) => {
   app.use(express.urlencoded({ extended: true }));
 
   // HTTP request logger
-  const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
-  app.use(morgan(morganFormat, {
-    stream: {
-      write: (message) => logger.info(message.trim()),
-    },
-  }));
+  const morganFormat = config.nodeEnv === 'production' ? 'combined' : 'dev';
+  app.use(morgan(morganFormat));
 
-  logger.info('✅ Middlewares cargados');
+  console.log('✅ Middlewares cargados');
 };
+

@@ -33,6 +33,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.22.0",
@@ -42,5 +43,8 @@
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.18.3",
     "yamljs": "^0.3.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

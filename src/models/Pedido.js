@@ -104,6 +104,6 @@ pedidoSchema.methods.cambiarEstado = async function(nuevoEstado, usuarioId) {
 // Índices para consultas frecuentes
 pedidoSchema.index({ usuario: 1, createdAt: -1 });
 pedidoSchema.index({ estado: 1, createdAt: -1 });
-pedidoSchema.index({ numero_pedido: 1 });
+// El índice de numero_pedido se crea automáticamente por la propiedad unique: true
 
 export default mongoose.model('Pedido', pedidoSchema);

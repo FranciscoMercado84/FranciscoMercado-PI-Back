@@ -99,7 +99,7 @@ Crea un archivo `.env` en la raíz del proyecto:
 
 ```env
 # Servidor
-PORT=3000
+PORT=3001
 NODE_ENV=development
 
 # MongoDB
@@ -108,18 +108,19 @@ MONGODB_URI_TEST=mongodb://localhost:27017/panaderia_test
 
 # JWT
 JWT_SECRET=tu_secreto_super_seguro_aqui
-JWT_EXPIRATION=7d
-JWT_REFRESH_SECRET=otro_secreto_diferente_aqui
-JWT_REFRESH_EXPIRATION=30d
+JWT_EXPIRATION=30d
 
-# Admin (credenciales iniciales)
+# Frontend
+FRONTEND_URL=http://localhost:5173
+
+# Admin (credenciales iniciales - cambiar en producción)
 ADMIN_EMAIL=admin@panaderia.com
-ADMIN_PASSWORD=Admin123!
+ADMIN_PASSWORD=admin123
 ```
 
-**Generar secretos seguros**:
+**Generar secreto JWT seguro**:
 ```bash
-# Ejecuta esto DOS veces para generar JWT_SECRET y JWT_REFRESH_SECRET
+# Ejecuta esto para generar JWT_SECRET
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
@@ -153,13 +154,13 @@ npm run dev
 npm start
 ```
 
-El servidor estará disponible en: `http://localhost:3000`
+El servidor estará disponible en: `http://localhost:3001`
 
 ### 7. Verificar Instalación
 
 **Health Check**:
 ```powershell
-Invoke-RestMethod -Uri http://localhost:3000/health
+Invoke-RestMethod -Uri http://localhost:3001/health
 ```
 
 Respuesta esperada:
@@ -174,7 +175,201 @@ Respuesta esperada:
 
 **Documentación Swagger**:
 
-Abre en tu navegador: `http://localhost:3000/api-docs`
+Abre en tu navegador: `http://localhost:3001/api-docs`
+
+---
+
+## 🌐 Despliegue en Producción
+
+### Despliegue del Backend en Render
+
+#### 1. Preparar el Proyecto
+
+El proyecto ya está configurado con `render.yaml` para auto-despliegue.
+
+#### 2. Configurar Variables de Entorno en Render
+
+Una vez creado el servicio en [Render](https://render.com), configura las siguientes variables de entorno en el Dashboard:
+
+```env
+PORT=3001
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/panaderia?retryWrites=true&w=majority
+JWT_SECRET=tu_secreto_jwt_seguro_generado_con_crypto
+JWT_EXPIRATION=30d
+FRONTEND_URL=https://tu-frontend.vercel.app
+ADMIN_EMAIL=admin@panaderia.com
+ADMIN_PASSWORD=admin123_cambiar_en_produccion
+```
+
+#### 3. Variables de Entorno Requeridas
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `PORT` | Puerto del servidor (Render lo asigna automáticamente) | `3001` |
+| `NODE_ENV` | Entorno de ejecución | `production` |
+| `MONGODB_URI` | Cadena de conexión a MongoDB Atlas | `mongodb+srv://...` |
+| `JWT_SECRET` | Secreto para firmar tokens JWT (mínimo 32 caracteres) | Generar con crypto |
+| `JWT_EXPIRATION` | Tiempo de expiración del token | `30d` |
+| `FRONTEND_URL` | **URL del frontend desplegado en Vercel** | `https://tu-app.vercel.app` |
+| `ADMIN_EMAIL` | Email del usuario administrador inicial | `admin@panaderia.com` |
+| `ADMIN_PASSWORD` | Contraseña del administrador (cambiar después del primer login) | `Admin123!` |
+
+#### 4. Generar JWT_SECRET Seguro
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+Copia el resultado y úsalo como valor para `JWT_SECRET` en Render.
+
+#### 5. Configurar MongoDB Atlas
+
+1. Crea una cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Crea un cluster gratuito (M0)
+3. En **Network Access**, agrega `0.0.0.0/0` para permitir conexiones desde Render
+4. En **Database Access**, crea un usuario con permisos de lectura/escritura
+5. Obtén la cadena de conexión desde **Connect > Connect your application**
+6. Reemplaza `<password>` con la contraseña del usuario
+7. Usa esta cadena como `MONGODB_URI`
+
+#### 6. Configuración CORS
+
+El backend ya está configurado para aceptar peticiones del frontend:
+
+**Archivo**: [src/loaders/middleware.js](src/loaders/middleware.js)
+```javascript
+app.use(cors({
+  origin: config.frontend.url,  // Lee de FRONTEND_URL
+  credentials: true,             // Permite envío de cookies
+}));
+```
+
+**Archivo**: [src/config/index.js](src/config/index.js)
+```javascript
+frontend: {
+  url: process.env.FRONTEND_URL || 'http://localhost:5173',
+}
+```
+
+**⚠️ Importante**: 
+- En **desarrollo**, `FRONTEND_URL=http://localhost:5173`
+- En **producción** (Render), `FRONTEND_URL=https://tu-frontend.vercel.app`
+
+#### 7. URL del Backend en Render
+
+Después del despliegue, tu backend estará disponible en:
+```
+https://tu-app.onrender.com
+```
+
+---
+
+### Despliegue del Frontend en Vercel
+
+#### Configurar Variables de Entorno en Vercel
+
+En el dashboard de [Vercel](https://vercel.com), configura:
+
+```env
+VITE_API_BASE_URL=https://tu-backend.onrender.com/api
+```
+
+**⚠️ Importante**: 
+- Incluye `/api` al final de la URL
+- Usa la URL exacta que te proporciona Render
+- No incluyas una barra `/` al final después de `/api`
+
+---
+
+### Verificar Integración Backend-Frontend
+
+#### 1. Probar CORS
+
+Desde la consola del navegador en tu frontend desplegado:
+
+```javascript
+fetch('https://tu-backend.onrender.com/health', {
+  credentials: 'include'
+})
+.then(r => r.json())
+.then(console.log)
+```
+
+Debes recibir:
+```json
+{
+  "status": "OK",
+  "timestamp": "...",
+  "mongodb": "connected"
+}
+```
+
+#### 2. Probar Endpoint de Login
+
+```javascript
+fetch('https://tu-backend.onrender.com/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({
+    email: 'admin@panaderia.com',
+    password: 'admin123'
+  })
+})
+.then(r => r.json())
+.then(console.log)
+```
+
+Respuesta esperada:
+```json
+{
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "...",
+      "email": "admin@panaderia.com",
+      "nombre": "Administrador",
+      "role": "admin",
+      "name": "Administrador"
+    }
+  }
+}
+```
+
+---
+
+### Resumen de URLs
+
+| Entorno | Backend | Frontend | FRONTEND_URL en Backend | VITE_API_BASE_URL en Frontend |
+|---------|---------|----------|-------------------------|-------------------------------|
+| **Desarrollo** | `http://localhost:3001` | `http://localhost:5173` | `http://localhost:5173` | `http://localhost:3001/api` |
+| **Producción** | `https://tu-backend.onrender.com` | `https://tu-frontend.vercel.app` | `https://tu-frontend.vercel.app` | `https://tu-backend.onrender.com/api` |
+
+---
+
+### Checklist de Despliegue
+
+#### Backend (Render)
+- [ ] Repositorio conectado a Render
+- [ ] Variables de entorno configuradas
+- [ ] MongoDB Atlas configurado y accesible
+- [ ] `FRONTEND_URL` apunta a la URL de Vercel
+- [ ] JWT_SECRET generado de forma segura
+- [ ] Despliegue exitoso
+- [ ] Health check responde correctamente
+
+#### Frontend (Vercel)
+- [ ] Repositorio conectado a Vercel
+- [ ] `VITE_API_BASE_URL` configurada con URL de Render
+- [ ] Build exitoso
+- [ ] Puede conectar con el backend
+
+#### Integración
+- [ ] CORS configurado correctamente
+- [ ] Login funciona desde el frontend desplegado
+- [ ] Requests se envían con `credentials: 'include'`
+- [ ] Tokens JWT se reciben correctamente
 
 ---
 
@@ -269,8 +464,6 @@ enum CategoriaProducto {
 ✅ **Simplicidad**: Sin joins ni referencias  
 ✅ **Validación**: Mongoose valida automáticamente valores permitidos  
 ✅ **Menor espacio**: Strings vs ObjectIds  
-
-Para más detalles sobre la migración de categorías, consulta [MIGRACION_CATEGORIAS.md](docs/MIGRACION_CATEGORIAS.md).
 
 ---
 

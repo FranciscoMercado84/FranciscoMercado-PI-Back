@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "seed": "node scripts/seed.js",
+    "upload:images": "node scripts/upload-images-to-cloudinary.js",
     "migrate:categorias": "node scripts/migrate-categorias.js",
     "drop:categorias": "node scripts/drop-categorias-collection.js"
   },
@@ -32,6 +33,7 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

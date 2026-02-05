@@ -454,7 +454,7 @@ Respuesta esperada:
 ```
 panaderia-backend/
 ├── src/
-│   ├── config/          # Configuración (DB, Swagger, etc.)
+│   ├── config/          # Configuración (DB, Swagger, Cloudinary, etc.)
 │   ├── controllers/     # Controladores (lógica de endpoints)
 │   ├── loaders/         # Inicializadores (middleware, routes)
 │   ├── middlewares/     # Middlewares personalizados
@@ -467,7 +467,9 @@ panaderia-backend/
 ├── docs/
 │   ├── api/             # Documentación API (OpenAPI, Swagger)
 │   ├── diagramas/       # Diagramas de arquitectura
+│   └── CLOUDINARY_SETUP.md  # Guía de configuración de Cloudinary
 ├── scripts/             # Scripts de utilidad (seed, migrate, etc.)
+├── uploads/temp/        # Archivos temporales (imágenes antes de subir a Cloudinary)
 ├── logs/                # Logs de Winston (no versionados)
 ├── postman/             # Colecciones Postman para testing
 ├── .env                 # Variables de entorno (NO versionar)
@@ -476,6 +478,52 @@ panaderia-backend/
 ├── render.yaml          # Configuración de Render
 └── README.md            # Este archivo
 ```
+
+---
+
+## 📸 Gestión de Imágenes y Stock
+
+### Cloudinary para Imágenes
+
+Este proyecto usa **Cloudinary** para gestionar las imágenes de productos de forma eficiente.
+
+**Características:**
+- ✅ Almacenamiento en la nube
+- ✅ Optimización automática de imágenes
+- ✅ Conversión a WebP automática
+- ✅ Redimensionamiento y transformaciones
+- ✅ 25GB gratis en el plan free
+
+**Configuración rápida:**
+1. Crea cuenta en [Cloudinary](https://cloudinary.com)
+2. Obtén tus credenciales del Dashboard
+3. Agrégalas al `.env`:
+```env
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+```
+
+**Guía completa:** Ver [docs/CLOUDINARY_SETUP.md](docs/CLOUDINARY_SETUP.md)
+
+### Gestión de Inventario
+
+El sistema incluye gestión automática de stock:
+
+**Campos nuevos en Producto:**
+- `stock`: Cantidad disponible
+- `stock_minimo`: Nivel mínimo de reorden
+- `stock_bajo`: Virtual (true si stock <= stock_minimo)
+- `estado_inventario`: Virtual ('agotado', 'bajo', 'disponible')
+
+**Endpoints de inventario (admin):**
+- `PUT /v1/productos/:id/stock` - Actualizar stock
+- `GET /v1/productos/inventario/bajo-stock` - Productos con stock bajo
+- `GET /v1/productos/inventario/agotados` - Productos agotados
+
+**Comportamiento automático:**
+- Si `stock === 0`, `disponible` se marca como `false`
+- Si vuelve a haber stock, `disponible` se marca como `true`
 
 ---
 

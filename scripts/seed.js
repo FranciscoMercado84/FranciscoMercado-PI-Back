@@ -39,7 +39,7 @@ const seedDatabase = async () => {
 
     console.log('✅ Usuarios creados');
 
-    // Productos con nuevas categorías enum
+    // Productos con nuevas categorías enum y gestión de inventario
     console.log('🍞 Creando productos...');
     const productos = await Producto.create([
       // PANADERÍA
@@ -52,7 +52,9 @@ const seedDatabase = async () => {
         peso: 250,
         ingredientes: 'Harina de trigo, agua, sal, levadura',
         alergenos: ['gluten'],
-        destacado: true
+        destacado: true,
+        stock: 50,
+        stock_minimo: 20
       },
       {
         nombre: 'Panvillo Tradicional',
@@ -62,7 +64,9 @@ const seedDatabase = async () => {
         categoria: 'Panadería',
         peso: 500,
         ingredientes: 'Harina de trigo, agua, sal, levadura',
-        alergenos: ['gluten']
+        alergenos: ['gluten'],
+        stock: 30,
+        stock_minimo: 15
       },
       {
         nombre: 'Barra Parisienne',
@@ -72,7 +76,9 @@ const seedDatabase = async () => {
         categoria: 'Panadería',
         peso: 180,
         alergenos: ['gluten'],
-        destacado: true
+        destacado: true,
+        stock: 60,
+        stock_minimo: 25
       },
       {
         nombre: 'Mollete Clásico',
@@ -82,7 +88,9 @@ const seedDatabase = async () => {
         categoria: 'Panadería',
         peso: 100,
         alergenos: ['gluten'],
-        destacado: true
+        destacado: true,
+        stock: 100,
+        stock_minimo: 40
       },
       {
         nombre: 'Baguette Tradicional',
@@ -91,7 +99,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/baguette.jpg',
         categoria: 'Panadería',
         peso: 250,
-        alergenos: ['gluten']
+        alergenos: ['gluten'],
+        stock: 45,
+        stock_minimo: 20
       },
 
       // DULCES
@@ -104,7 +114,9 @@ const seedDatabase = async () => {
         peso: 80,
         ingredientes: 'Harina, mantequilla, azúcar, levadura',
         alergenos: ['gluten', 'lácteos'],
-        destacado: true
+        destacado: true,
+        stock: 35,
+        stock_minimo: 15
       },
       {
         nombre: 'Palmera de Chocolate',
@@ -113,7 +125,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/palmera-chocolate.jpg',
         categoria: 'Dulces',
         peso: 100,
-        alergenos: ['gluten', 'lácteos']
+        alergenos: ['gluten', 'lácteos'],
+        stock: 25,
+        stock_minimo: 10
       },
       {
         nombre: 'Napolitana',
@@ -122,7 +136,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/napolitana.jpg',
         categoria: 'Dulces',
         peso: 90,
-        alergenos: ['gluten', 'lácteos']
+        alergenos: ['gluten', 'lácteos'],
+        stock: 30,
+        stock_minimo: 12
       },
 
       // CONSERVAS Y ENLATADOS
@@ -134,7 +150,9 @@ const seedDatabase = async () => {
         categoria: 'Conservas y Enlatados',
         peso: 150,
         ingredientes: 'Atún, aceite de oliva, sal',
-        alergenos: ['pescado']
+        alergenos: ['pescado'],
+        stock: 80,
+        stock_minimo: 20
       },
       {
         nombre: 'Tomate Frito Casero',
@@ -143,7 +161,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/tomate-frito.jpg',
         categoria: 'Conservas y Enlatados',
         peso: 400,
-        ingredientes: 'Tomate, aceite de oliva, sal, azúcar'
+        ingredientes: 'Tomate, aceite de oliva, sal, azúcar',
+        stock: 60,
+        stock_minimo: 15
       },
 
       // ACEITES, VINAGRES Y SALSAS
@@ -154,7 +174,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/aceite-oliva.jpg',
         categoria: 'Aceites, Vinagres y Salsas',
         peso: 750,
-        destacado: true
+        destacado: true,
+        stock: 40,
+        stock_minimo: 10
       },
       {
         nombre: 'Vinagre de Jerez',
@@ -162,7 +184,9 @@ const seedDatabase = async () => {
         precio: 3.50,
         imagen_url: '/images/vinagre-jerez.jpg',
         categoria: 'Aceites, Vinagres y Salsas',
-        peso: 500
+        peso: 500,
+        stock: 35,
+        stock_minimo: 8
       },
 
       // CHARCUTERÍA
@@ -173,7 +197,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/jamon-serrano.jpg',
         categoria: 'Charcutería',
         peso: 100,
-        ingredientes: 'Jamón de cerdo, sal'
+        ingredientes: 'Jamón de cerdo, sal',
+        stock: 25,
+        stock_minimo: 8
       },
       {
         nombre: 'Chorizo Ibérico',
@@ -183,7 +209,9 @@ const seedDatabase = async () => {
         categoria: 'Charcutería',
         peso: 200,
         ingredientes: 'Carne de cerdo ibérico, pimentón, sal, ajo',
-        destacado: true
+        destacado: true,
+        stock: 20,
+        stock_minimo: 5
       },
 
       // BEBIDAS Y BODEGA
@@ -193,7 +221,9 @@ const seedDatabase = async () => {
         precio: 0.80,
         imagen_url: '/images/agua.jpg',
         categoria: 'Bebidas y Bodega',
-        peso: 1500
+        peso: 1500,
+        stock: 150,
+        stock_minimo: 50
       },
       {
         nombre: 'Vino Tinto Crianza',
@@ -202,7 +232,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/vino-tinto.jpg',
         categoria: 'Bebidas y Bodega',
         peso: 750,
-        destacado: true
+        destacado: true,
+        stock: 30,
+        stock_minimo: 10
       },
 
       // DESPENSA Y BÁSICOS
@@ -212,7 +244,9 @@ const seedDatabase = async () => {
         precio: 2.20,
         imagen_url: '/images/arroz.jpg',
         categoria: 'Despensa y básicos',
-        peso: 1000
+        peso: 1000,
+        stock: 100,
+        stock_minimo: 30
       },
       {
         nombre: 'Pasta Espaguetis',
@@ -221,7 +255,9 @@ const seedDatabase = async () => {
         imagen_url: '/images/espaguetis.jpg',
         categoria: 'Despensa y básicos',
         peso: 500,
-        alergenos: ['gluten']
+        alergenos: ['gluten'],
+        stock: 90,
+        stock_minimo: 25
       },
       {
         nombre: 'Sal Marina',
@@ -229,7 +265,9 @@ const seedDatabase = async () => {
         precio: 0.90,
         imagen_url: '/images/sal.jpg',
         categoria: 'Despensa y básicos',
-        peso: 1000
+        peso: 1000,
+        stock: 200,
+        stock_minimo: 50
       }
     ]);
 

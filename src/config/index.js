@@ -21,6 +21,11 @@ export const config = {
     email: process.env.ADMIN_EMAIL || 'admin@panaderia.com',
     password: process.env.ADMIN_PASSWORD || 'admin123',
   },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
 };
 
 export default config;

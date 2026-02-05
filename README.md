@@ -256,12 +256,73 @@ frontend: {
 - En **desarrollo**, `FRONTEND_URL=http://localhost:5173`
 - En **producción** (Render), `FRONTEND_URL=https://tu-frontend.vercel.app`
 
-#### 7. URL del Backend en Render
+#### 7. Poblar Base de Datos con Usuario Administrador
+
+**⚠️ IMPORTANTE**: Después del primer despliegue, necesitas crear el usuario administrador en la base de datos.
+
+**Opción A: Ejecutar seed localmente contra MongoDB Atlas**
+
+1. Configura temporalmente tu `.env` local con las mismas variables de producción:
+```env
+MONGODB_URI=tu_mongodb_atlas_uri_de_produccion
+ADMIN_EMAIL=admin@panaderia.com
+ADMIN_PASSWORD=admin123
+```
+
+2. Ejecuta el seed localmente:
+```bash
+npm run seed
+```
+
+3. Restaura tu `.env` local a desarrollo.
+
+**Opción B: Usar MongoDB Compass**
+
+1. Conecta MongoDB Compass a tu cluster de Atlas
+2. Ve a la base de datos `panaderia`
+3. Crea la colección `usuarios` si no existe
+4. Inserta un documento manualmente:
+```json
+{
+  "nombre": "Administrador",
+  "email": "admin@panaderia.com",
+  "password": "$2b$10$[hash_bcrypt_de_admin123]",
+  "rol": "admin",
+  "telefono": "666111222",
+  "activo": true,
+  "createdAt": { "$date": "2026-02-05T00:00:00.000Z" },
+  "updatedAt": { "$date": "2026-02-05T00:00:00.000Z" }
+}
+```
+
+**Opción C: Crear usuario mediante API**
+
+Si implementas un endpoint temporal de registro de admin o usas Postman/Thunder Client:
+
+```bash
+curl -X POST https://tu-backend.onrender.com/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Administrador",
+    "email": "admin@panaderia.com",
+    "password": "admin123",
+    "telefono": "666111222"
+  }'
+```
+
+Luego actualiza manualmente el `rol` a `admin` en MongoDB Compass.
+
+#### 8. URL del Backend en Render
 
 Después del despliegue, tu backend estará disponible en:
 ```
 https://tu-app.onrender.com
 ```
+
+**Rutas principales**:
+- Health check: `https://tu-app.onrender.com/health`
+- Login: `https://tu-app.onrender.com/v1/auth/login`
+- API base: `https://tu-app.onrender.com/v1/`
 
 ---
 
@@ -272,13 +333,13 @@ https://tu-app.onrender.com
 En el dashboard de [Vercel](https://vercel.com), configura:
 
 ```env
-VITE_API_BASE_URL=https://tu-backend.onrender.com/api
+VITE_API_BASE_URL=https://tu-backend.onrender.com/v1
 ```
 
 **⚠️ Importante**: 
-- Incluye `/api` al final de la URL
+- Incluye `/v1` al final de la URL (no `/api`)
 - Usa la URL exacta que te proporciona Render
-- No incluyas una barra `/` al final después de `/api`
+- No incluyas una barra `/` al final después de `/v1`
 
 ---
 
@@ -308,7 +369,7 @@ Debes recibir:
 #### 2. Probar Endpoint de Login
 
 ```javascript
-fetch('https://tu-backend.onrender.com/api/auth/login', {
+fetch('https://tu-backend.onrender.com/v1/auth/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include',
@@ -343,8 +404,8 @@ Respuesta esperada:
 
 | Entorno | Backend | Frontend | FRONTEND_URL en Backend | VITE_API_BASE_URL en Frontend |
 |---------|---------|----------|-------------------------|-------------------------------|
-| **Desarrollo** | `http://localhost:3001` | `http://localhost:5173` | `http://localhost:5173` | `http://localhost:3001/api` |
-| **Producción** | `https://tu-backend.onrender.com` | `https://tu-frontend.vercel.app` | `https://tu-frontend.vercel.app` | `https://tu-backend.onrender.com/api` |
+| **Desarrollo** | `http://localhost:3001` | `http://localhost:5173` | `http://localhost:5173` | `http://localhost:3001/v1` |
+| **Producción** | `https://tu-backend.onrender.com` | `https://tu-frontend.vercel.app` | `https://tu-frontend.vercel.app` | `https://tu-backend.onrender.com/v1` |
 
 ---
 
@@ -491,6 +552,31 @@ Los reportes de cobertura se generan en `coverage/`:
 ---
 
 ## 🐛 Solución de Problemas
+
+### Error: "Credenciales incorrectas" en producción (Render/Vercel)
+
+**Causa**: La base de datos en MongoDB Atlas está vacía, no hay usuarios creados.
+
+**Solución**:
+1. Verifica que el backend esté funcionando: `https://tu-backend.onrender.com/health`
+2. Crea el usuario administrador siguiendo las instrucciones en [Poblar Base de Datos](#7-poblar-base-de-datos-con-usuario-administrador)
+3. Verifica que la URL en el frontend sea: `https://tu-backend.onrender.com/v1` (con `/v1`, no `/api`)
+4. Verifica que `FRONTEND_URL` en Render esté configurada con la URL de Vercel
+
+**Verificar credenciales desde la consola del navegador**:
+```javascript
+fetch('https://tu-backend.onrender.com/v1/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include',
+  body: JSON.stringify({
+    email: 'admin@panaderia.com',
+    password: 'admin123'
+  })
+})
+.then(r => r.json())
+.then(console.log)
+```
 
 ### Error: "Cannot connect to MongoDB"
 

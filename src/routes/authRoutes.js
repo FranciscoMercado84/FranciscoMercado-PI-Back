@@ -3,14 +3,14 @@
  */
 
 import { Router } from 'express';
-import { loginHandler, getCurrentUser, verifyTokenHandler } from '../controllers/authController.js';
+import { login, register, getProfile } from '../controllers/authController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
 // Rutas de autenticación
-router.post('/login', loginHandler);
-router.get('/me', authMiddleware, getCurrentUser);
-router.post('/verify', authMiddleware, verifyTokenHandler);
+router.post('/register', register);
+router.post('/login', login);
+router.get('/profile', authMiddleware, getProfile);
 
 export default router;

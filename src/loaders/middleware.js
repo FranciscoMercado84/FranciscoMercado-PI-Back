@@ -12,10 +12,19 @@ export const middlewareLoader = (app) => {
   app.use(helmet());
   
   // CORS
+  const corsOrigin = config.frontend.url;
+  console.log('🌐 CORS configured for origin:', corsOrigin);
+  
   app.use(cors({
-    origin: config.frontend.url,
+    origin: corsOrigin,
     credentials: true,
   }));
+
+  // Log all requests
+  app.use((req, res, next) => {
+    console.log(`📥 ${req.method} ${req.path} - Origin: ${req.get('origin') || 'none'}`);
+    next();
+  });
 
   // Body parsing
   app.use(express.json());

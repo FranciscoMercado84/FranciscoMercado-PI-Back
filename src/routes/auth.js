@@ -15,7 +15,7 @@ router.post(
       .isLength({ min: 6 })
       .withMessage('La contraseña debe tener al menos 6 caracteres'),
     body('telefono')
-      .optional()
+      .optional({ values: 'falsy' })
       .matches(/^[0-9]{9}$/)
       .withMessage('Teléfono debe tener 9 dígitos'),
     validate

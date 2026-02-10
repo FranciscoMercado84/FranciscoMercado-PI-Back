@@ -13,14 +13,38 @@ export const getCarrito = asyncHandler(async (req, res) => {
 });
 
 export const addItem = asyncHandler(async (req, res) => {
-  const { producto_id, cantidad = 1 } = req.body;
+  // Aceptar tanto producto_id (snake) como productoId (camel)
+  const productoId = req.body.producto_id || req.body.productoId;
+  const cantidad = req.body.cantidad || 1;
+
+  if (!productoId) {
+    return res.status(400).json({
+      code: 'MISSING_PRODUCT_ID',
+      message: 'El ID del producto es obligatorio (producto_id o productoId)'
+    });
+  }
 
   // Verificar producto
-  const producto = await Producto.findById(producto_id);
-  if (!producto || !producto.disponible) {
+  const producto = await Producto.findById(productoId);
+  if (!producto) {
+    return res.status(404).json({
+      code: 'PRODUCTO_NOT_FOUND',
+      message: 'Producto no encontrado'
+    });
+  }
+
+  if (!producto.disponible) {
     return res.status(400).json({
       code: 'PRODUCTO_NOT_AVAILABLE',
       message: 'Producto no disponible'
+    });
+  }
+
+  if (producto.stock < cantidad) {
+    return res.status(400).json({
+      code: 'INSUFFICIENT_STOCK',
+      message: `Stock insuficiente. Disponible: ${producto.stock}`,
+      stock_disponible: producto.stock
     });
   }
 
@@ -32,14 +56,14 @@ export const addItem = asyncHandler(async (req, res) => {
 
   // Verificar si producto ya existe
   const itemExistente = carrito.items.find(
-    item => item.producto.toString() === producto_id
+    item => item.producto.toString() === productoId
   );
 
   if (itemExistente) {
     itemExistente.cantidad += cantidad;
   } else {
     carrito.items.push({
-      producto: producto_id,
+      producto: productoId,
       cantidad,
       precio_unitario: producto.precio
     });

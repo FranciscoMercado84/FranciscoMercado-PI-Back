@@ -96,6 +96,8 @@ productoSchema.virtual('estado_inventario').get(function() {
 productoSchema.pre('save', function(next) {
   if (this.stock === 0) {
     this.disponible = false;
+  } else if (this.isModified('stock') && this.stock > 0) {
+    this.disponible = true;
   }
   next();
 });

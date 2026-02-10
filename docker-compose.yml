@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  # SonarQube - Análisis de calidad de código
+  sonarqube:
+    image: sonarqube
+    container_name: sonarqube_panaderia
+    ports:
+      - "9000:9000"

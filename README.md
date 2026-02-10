@@ -576,6 +576,95 @@ enum CategoriaProducto {
 
 ---
 
+## 🔗 API Reference
+
+### Base URL
+- **Desarrollo**: `http://localhost:3001/v1`
+- **Producción**: `https://tu-backend.onrender.com/v1`
+
+### Autenticación
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| POST | `/auth/register` | Registrar nuevo usuario | ❌ |
+| POST | `/auth/login` | Iniciar sesión | ❌ |
+| GET | `/auth/profile` | Obtener perfil del usuario | ✅ |
+
+### Productos
+| Método | Endpoint | Descripción | Auth | Admin |
+|--------|----------|-------------|------|-------|
+| GET | `/productos` | Listar productos (con filtros) | ❌ | ❌ |
+| GET | `/productos/:id` | Obtener producto por ID | ❌ | ❌ |
+| POST | `/productos` | Crear producto | ✅ | ✅ |
+| PUT | `/productos/:id` | Actualizar producto | ✅ | ✅ |
+| DELETE | `/productos/:id` | Eliminar producto | ✅ | ✅ |
+| POST | `/productos/:id/imagen` | Subir imagen (multipart) | ✅ | ✅ |
+| PUT | `/productos/:id/stock` | Actualizar stock | ✅ | ✅ |
+
+### Inventario (Admin)
+| Método | Endpoint | Descripción | Auth | Admin |
+|--------|----------|-------------|------|-------|
+| GET | `/productos/inventario/bajo-stock` | Productos con stock bajo | ✅ | ✅ |
+| GET | `/productos/inventario/agotados` | Productos sin stock | ✅ | ✅ |
+
+### Carrito
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| GET | `/carrito` | Obtener carrito del usuario | ✅ |
+| POST | `/carrito/items` | Añadir producto al carrito | ✅ |
+| PUT | `/carrito/items/:productoId` | Actualizar cantidad | ✅ |
+| DELETE | `/carrito/items/:productoId` | Eliminar producto del carrito | ✅ |
+| DELETE | `/carrito` | Vaciar carrito completo | ✅ |
+
+### Pedidos
+| Método | Endpoint | Descripción | Auth | Admin |
+|--------|----------|-------------|------|-------|
+| POST | `/pedidos` | Crear pedido (desde carrito) | ✅ | ❌ |
+| GET | `/pedidos` | Listar mis pedidos | ✅ | ❌ |
+| GET | `/pedidos/:id` | Obtener detalle de pedido | ✅ | ❌ |
+| PUT | `/pedidos/:id/estado` | Actualizar estado del pedido | ✅ | ✅ |
+| GET | `/pedidos/admin/todos` | Listar todos los pedidos | ✅ | ✅ |
+
+### Filtros de Productos
+
+```
+GET /v1/productos?categoria=Panadería&disponible=true&destacado=true&min_precio=1&max_precio=10&sort=precio&order=asc&page=1&limit=10
+```
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `categoria` | string | Filtrar por categoría |
+| `disponible` | boolean | Solo productos disponibles |
+| `destacado` | boolean | Solo productos destacados |
+| `min_precio` | number | Precio mínimo |
+| `max_precio` | number | Precio máximo |
+| `search` | string | Buscar por nombre/descripción |
+| `sort` | string | Campo para ordenar (nombre, precio, createdAt) |
+| `order` | string | Dirección (asc, desc) |
+| `page` | number | Número de página |
+| `limit` | number | Resultados por página |
+
+### Estados de Pedido
+
+```
+pendiente → en_preparacion → listo → enviado → entregado
+                ↓                       ↓
+             cancelado              cancelado
+```
+
+### Códigos de Respuesta
+
+| Código | Significado |
+|--------|-------------|
+| 200 | Éxito |
+| 201 | Creado |
+| 400 | Error de validación |
+| 401 | No autenticado |
+| 403 | Sin permisos (no admin) |
+| 404 | Recurso no encontrado |
+| 500 | Error del servidor |
+
+---
+
 ## 🧪 Testing
 
 ### Ejecutar Tests
@@ -585,17 +674,115 @@ enum CategoriaProducto {
 npm test
 
 # Tests con coverage
-npm run coverage
+npm run test:coverage
 
 # Tests en modo watch
 npm run test:watch
+```
+
+### Estructura de Tests
+
+```
+tests/
+├── setup.js          # Helpers, constantes y utilidades compartidas
+├── auth.test.js      # Tests de autenticación (registro, login, perfil)
+├── productos.test.js # Tests CRUD de productos e inventario
+├── carrito.test.js   # Tests del carrito de compras
+├── pedidos.test.js   # Tests de gestión de pedidos
+└── health.test.js    # Tests de health check, CORS y 404
+```
+
+### Helpers de Tests
+
+En `tests/setup.js` se exportan utilidades para todos los tests:
+
+```javascript
+// Credenciales de prueba
+const TEST_USERS = {
+  admin: { email: 'admin@panaderia.com', password: 'admin123' },
+  cliente: { email: 'cliente@test.com', password: 'test123' }
+};
+
+// Obtener token de autenticación
+const token = await getAuthToken(app, 'admin');
+
+// Crear producto de prueba
+const producto = await createTestProduct(app, adminToken);
+
+// Generar email único
+const email = generateUniqueEmail();
 ```
 
 ### Cobertura de Tests
 
 Los reportes de cobertura se generan en `coverage/`:
 - `coverage/index.html` - Reporte visual en HTML
-- `coverage/lcov.info` - Formato LCOV para integraciones
+- `coverage/lcov.info` - Formato LCOV para SonarQube
+
+### Usuarios de Prueba
+
+| Usuario | Email | Password | Rol |
+|---------|-------|----------|-----|
+| Admin | admin@panaderia.com | admin123 | admin |
+| Cliente | cliente@test.com | test123 | cliente |
+
+⚠️ **Nota**: Ejecuta `npm run seed` antes de los tests para crear los usuarios de prueba.
+
+---
+
+## 📊 SonarQube - Análisis de Calidad
+
+### Ejecutar SonarQube con Docker
+
+```bash
+# Iniciar SonarQube
+docker-compose up -d sonarqube
+
+# Esperar a que inicie (puede tardar 1-2 minutos)
+# Acceder a: http://localhost:9000
+# Usuario: admin / Password: admin (cambiar en primer login)
+```
+
+### Ejecutar Análisis
+
+```bash
+# Primero, generar el reporte de cobertura
+npm run test:coverage
+
+# Luego, ejecutar el scanner (requiere sonar-scanner instalado)
+# Opción 1: Docker
+docker run --rm \
+  -v "$(pwd):/usr/src" \
+  -e SONAR_HOST_URL="http://host.docker.internal:9000" \
+  -e SONAR_LOGIN="tu_token_de_sonarqube" \
+  sonarsource/sonar-scanner-cli
+
+# Opción 2: npx
+npx sonar-scanner \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=tu_token_de_sonarqube
+```
+
+### Configuración de SonarQube
+
+El archivo `sonar-project.properties` ya está configurado:
+
+```properties
+sonar.projectKey=panaderia-backend
+sonar.projectName=Panadería Backend
+sonar.sources=src
+sonar.tests=tests
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+sonar.coverage.exclusions=**/tests/**,**/config/**
+```
+
+### Métricas Analizadas
+
+- **Bugs**: Errores potenciales en el código
+- **Vulnerabilities**: Problemas de seguridad
+- **Code Smells**: Código que dificulta mantenimiento
+- **Coverage**: Porcentaje de código cubierto por tests
+- **Duplications**: Código duplicado
 
 ---
 

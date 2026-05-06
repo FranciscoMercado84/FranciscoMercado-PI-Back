@@ -99,6 +99,18 @@ pedidoSchema.methods.cambiarEstado = async function(nuevoEstado, usuarioId) {
   });
 
   await this.save();
+
+  // Si el pedido se marca como entregado, actualizar ventas_totales en productos
+  if (nuevoEstado === 'Entregado') {
+    const Producto = mongoose.model('Producto');
+    for (const item of this.items) {
+      await Producto.findByIdAndUpdate(
+        item.producto,
+        { $inc: { ventas_totales: item.cantidad } },
+        { new: true }
+      );
+    }
+  }
 };
 
 // Índices para consultas frecuentes

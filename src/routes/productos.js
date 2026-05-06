@@ -6,6 +6,11 @@ import { uploadProductImage } from '../config/multer.js';
 
 const router = express.Router();
 
+// ⚠️ IMPORTANTE: Las rutas especiales/estáticas deben ir ANTES de las rutas dinámicas (/:id)
+
+// Rutas especiales de productos (deben ir ANTES de /:id)
+router.get('/mas-vendidos', productosController.getProductosMasVendidos);
+
 // Rutas de inventario (admin only)
 router.get(
   '/inventario/bajo-stock',

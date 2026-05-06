@@ -256,3 +256,23 @@ export const getProductosAgotados = asyncHandler(async (req, res) => {
     }
   });
 });
+
+/**
+ * GET /v1/productos/mas-vendidos
+ * Obtener productos más vendidos (públicos)
+ */
+export const getProductosMasVendidos = asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit) || 4;
+
+  const productos = await Producto.find({ disponible: true })
+    .sort({ ventas_totales: -1, createdAt: -1 })
+    .limit(limit)
+    .select('nombre descripcion precio imagen_url categoria ventas_totales');
+
+  res.json({
+    data: productos,
+    meta: {
+      total: productos.length
+    }
+  });
+});

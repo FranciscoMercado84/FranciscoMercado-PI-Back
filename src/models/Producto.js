@@ -73,6 +73,11 @@ const productoSchema = new mongoose.Schema({
   destacado: {
     type: Boolean,
     default: false
+  },
+  ventas_totales: {
+    type: Number,
+    default: 0,
+    min: [0, 'Las ventas totales no pueden ser negativas']
   }
 }, {
   timestamps: true,

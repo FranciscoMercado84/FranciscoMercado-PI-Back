@@ -3,6 +3,7 @@ import authRoutes from './auth.js';
 import productosRoutes from './productos.js';
 import carritoRoutes from './carrito.js';
 import pedidosRoutes from './pedidos.js';
+import reportesRoutes from './reportes.js';
 
 const router = Router();
 
@@ -13,6 +14,9 @@ router.use('/productos', productosRoutes);
 // Rutas protegidas
 router.use('/carrito', carritoRoutes);
 router.use('/pedidos', pedidosRoutes);
+
+// Rutas de admin
+router.use('/reportes', reportesRoutes);
 
 // Ruta de bienvenida a la API
 router.get('/', (req, res) => {
@@ -27,6 +31,7 @@ router.get('/', (req, res) => {
       },
       productos: {
         list: 'GET /v1/productos',
+        masVendidos: 'GET /v1/productos/mas-vendidos',
         getById: 'GET /v1/productos/:id',
         create: 'POST /v1/productos (admin)',
         update: 'PUT /v1/productos/:id (admin)',
@@ -45,6 +50,13 @@ router.get('/', (req, res) => {
         getById: 'GET /v1/pedidos/:id (protected)',
         getAll: 'GET /v1/pedidos/admin/all (admin)',
         updateEstado: 'PUT /v1/pedidos/:id/estado (admin)',
+            reportes: {
+              estadisticas: 'GET /v1/reportes/estadisticas?periodo={7d|30d|3m|1y} (admin)',
+              ventasPorDia: 'GET /v1/reportes/ventas-por-dia?periodo={7d|30d|3m|1y} (admin)',
+              productosVendidos: 'GET /v1/reportes/productos-mas-vendidos?limit=5 (admin)',
+              resumenPedidos: 'GET /v1/reportes/resumen-pedidos (admin)',
+              exportar: 'GET /v1/reportes/exportar?tipo=ventas&periodo=7d (admin)',
+            },
       },
       health: '/health',
     },

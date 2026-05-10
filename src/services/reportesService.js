@@ -108,7 +108,8 @@ export const getVentasPorDia = async (periodo = '7d') => {
 
   // Mapear índices de día a etiquetas
   const resultado = diasSemana.map((dia, index) => {
-    const ventaDia = ventas.find(v => v._id === (index + 1) % 7 || (v._id === 1 && index === 0));
+    // $dayOfWeek returns 1=Sunday .. 7=Saturday, so compare directly to index+1
+    const ventaDia = ventas.find(v => v._id === (index + 1));
     return {
       dia,
       ventas: ventaDia ? Math.round(ventaDia.total * 100) / 100 : 0

@@ -40,14 +40,6 @@ export const addItem = asyncHandler(async (req, res) => {
     });
   }
 
-  if (producto.stock < cantidad) {
-    return res.status(400).json({
-      code: 'INSUFFICIENT_STOCK',
-      message: `Stock insuficiente. Disponible: ${producto.stock}`,
-      stock_disponible: producto.stock
-    });
-  }
-
   let carrito = await Carrito.findOne({ usuario: req.user.id });
 
   if (!carrito) {
@@ -70,7 +62,7 @@ export const addItem = asyncHandler(async (req, res) => {
   }
 
   await carrito.save();
-  await carrito.populate('items.producto', 'nombre precio imagen_url');
+  await carrito.populate('items.producto', 'nombre precio imagen_url disponible');
 
   res.status(201).json({ data: carrito });
 });

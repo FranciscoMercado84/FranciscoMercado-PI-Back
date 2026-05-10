@@ -37,9 +37,7 @@ describe('Cobertura Adicional - Validaciones y Casos Edge', () => {
     const producto = await Producto.create({
       nombre: 'Producto Test Coverage',
       precio: 10.99,
-      categoria: 'Panadería',
-      stock: 100,
-      peso: 500
+      categoria: 'Panadería'
     });
     productoId = producto._id;
   });
@@ -147,7 +145,7 @@ describe('Cobertura Adicional - Validaciones y Casos Edge', () => {
   // =========================================================================
   // CARRITO - Casos edge y validaciones
   // =========================================================================
-  describe('POST /v1/carrito/items - Validaciones stock', () => {
+  describe('POST /v1/carrito/items - Validaciones', () => {
     it.skip('debe rechazar cantidad mayor a stock disponible', async () => {
       const response = await request(app)
         .post('/v1/carrito/items')
@@ -341,43 +339,6 @@ describe('PUT /v1/carrito/items/:itemId - Actualizar cantidad', () => {
   // =========================================================================
   // PRODUCTOS - Casos edge adicionales
   // =========================================================================
-  describe('PUT /v1/productos/:id/stock - Validaciones', () => {
-    it('debe rechazar producto inexistente', async () => {
-      const response = await request(app)
-        .put('/v1/productos/507f1f77bcf86cd799439011/stock')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          operacion: 'agregar',
-          cantidad: 10
-        });
-
-      expect(response.status).toBe(404);
-    });
-
-    it.skip('debe rechazar cantidad negativa', async () => {
-      const response = await request(app)
-        .put(`/v1/productos/${productoId}/stock`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          operacion: 'agregar',
-          cantidad: -10
-        });
-
-      expect(response.status).toBe(400);
-    });
-
-    it('debe rechazar sin operación', async () => {
-      const response = await request(app)
-        .put(`/v1/productos/${productoId}/stock`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          cantidad: 10
-        });
-
-      expect(response.status).toBe(400);
-    });
-  });
-
   // =========================================================================
   // PERFIL - GET /v1/auth/profile
   // =========================================================================

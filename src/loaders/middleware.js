@@ -12,9 +12,11 @@ export const middlewareLoader = (app) => {
   app.use(helmet());
   
   // CORS
-  const corsOrigin = config.frontend.url;
+  let corsOrigin = config.frontend.url || '';
+  // Normalize: remove trailing slash if present to match browser `Origin`
+  if (corsOrigin.endsWith('/')) corsOrigin = corsOrigin.slice(0, -1);
   console.log('🌐 CORS configured for origin:', corsOrigin);
-  
+
   app.use(cors({
     origin: corsOrigin,
     credentials: true,

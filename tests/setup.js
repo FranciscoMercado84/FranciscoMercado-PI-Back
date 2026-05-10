@@ -60,9 +60,7 @@ export const createTestProduct = async (request, app, token) => {
     nombre: `Test Product ${Date.now()}`,
     descripcion: 'Producto de prueba',
     precio: 9.99,
-    categoria: 'Panadería',
-    stock: 100,
-    stock_minimo: 10
+    categoria: 'Panadería'
   };
 
   const response = await request(app)

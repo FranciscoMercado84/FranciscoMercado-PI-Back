@@ -43,33 +43,10 @@ const productoSchema = new mongoose.Schema({
     },
     required: [true, 'La categoría es obligatoria']
   },
-  // Gestión de inventario
-  stock: {
-    type: Number,
-    default: 0,
-    min: [0, 'El stock no puede ser negativo']
-  },
-  stock_minimo: {
-    type: Number,
-    default: 10,
-    min: [0, 'El stock mínimo no puede ser negativo']
-  },
   disponible: {
     type: Boolean,
     default: true
   },
-  peso: {
-    type: Number, // en gramos
-    min: [0, 'El peso no puede ser negativo']
-  },
-  ingredientes: {
-    type: String,
-    trim: true
-  },
-  alergenos: [{
-    type: String,
-    trim: true
-  }],
   destacado: {
     type: Boolean,
     default: false
@@ -81,36 +58,23 @@ const productoSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
-  toJSON: { virtuals: true },
+  toJSON: {
+    virtuals: true,
+    transform: (_doc, ret) => {
+      delete ret.stock;
+      delete ret.stock_minimo;
+      delete ret.peso;
+      delete ret.ingredientes;
+      delete ret.alergenos;
+      return ret;
+    }
+  },
   toObject: { virtuals: true }
-});
-
-// Virtual: Indica si el stock está bajo
-productoSchema.virtual('stock_bajo').get(function() {
-  return this.stock <= this.stock_minimo;
-});
-
-// Virtual: Estado del inventario
-productoSchema.virtual('estado_inventario').get(function() {
-  if (this.stock === 0) return 'agotado';
-  if (this.stock <= this.stock_minimo) return 'bajo';
-  return 'disponible';
-});
-
-// Hook: Actualizar disponibilidad automáticamente basado en stock
-productoSchema.pre('save', function(next) {
-  if (this.stock === 0) {
-    this.disponible = false;
-  } else if (this.isModified('stock') && this.stock > 0) {
-    this.disponible = true;
-  }
-  next();
 });
 
 // Índices para búsqueda y rendimiento
 productoSchema.index({ nombre: 'text', descripcion: 'text' });
 productoSchema.index({ categoria: 1, disponible: 1 });
 productoSchema.index({ destacado: 1, createdAt: -1 });
-productoSchema.index({ stock: 1 }); // Para consultas de inventario
 
 export default mongoose.model('Producto', productoSchema);

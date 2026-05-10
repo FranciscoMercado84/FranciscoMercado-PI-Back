@@ -26,7 +26,7 @@ describe('Carrito API - /v1/carrito', () => {
     // Obtener un producto real para usar en tests
     const productosResponse = await request(app).get('/v1/productos');
     const productoDisponible = productosResponse.body.data.find(
-      p => p.disponible && p.stock > 0
+      p => p.disponible
     );
     if (productoDisponible) {
       testProductId = productoDisponible._id;

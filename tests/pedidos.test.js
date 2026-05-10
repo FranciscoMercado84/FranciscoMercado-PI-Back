@@ -27,7 +27,7 @@ describe('Pedidos API - /v1/pedidos', () => {
     // Obtener un producto real
     const productosResponse = await request(app).get('/v1/productos');
     const productoDisponible = productosResponse.body.data.find(
-      p => p.disponible && p.stock > 0
+      p => p.disponible
     );
     if (productoDisponible) {
       testProductId = productoDisponible._id;

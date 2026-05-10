@@ -18,6 +18,7 @@
     "seed:test": "cross-env NODE_ENV=test node scripts/seed.js",
     "upload:images": "node scripts/upload-images-to-cloudinary.js",
     "migrate:categorias": "node scripts/migrate-categorias.js",
+    "migrate:productos": "node scripts/migrate-productos-remove-fields.js",
     "drop:categorias": "node scripts/drop-categorias-collection.js"
   },
   "author": "Paco",

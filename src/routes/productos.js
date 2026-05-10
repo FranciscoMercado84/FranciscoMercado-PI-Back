@@ -11,21 +11,6 @@ const router = express.Router();
 // Rutas especiales de productos (deben ir ANTES de /:id)
 router.get('/mas-vendidos', productosController.getProductosMasVendidos);
 
-// Rutas de inventario (admin only)
-router.get(
-  '/inventario/bajo-stock',
-  protect,
-  restrictTo('admin'),
-  productosController.getProductosBajoStock
-);
-
-router.get(
-  '/inventario/agotados',
-  protect,
-  restrictTo('admin'),
-  productosController.getProductosAgotados
-);
-
 // CRUD básico de productos
 router
   .route('/')
@@ -52,14 +37,6 @@ router.delete(
   protect,
   restrictTo('admin'),
   productosController.deleteProductImage
-);
-
-// Gestión de stock
-router.put(
-  '/:id/stock',
-  protect,
-  restrictTo('admin'),
-  productosController.updateStock
 );
 
 export default router;

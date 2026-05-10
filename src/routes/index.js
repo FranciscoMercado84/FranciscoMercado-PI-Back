@@ -4,12 +4,14 @@ import productosRoutes from './productos.js';
 import carritoRoutes from './carrito.js';
 import pedidosRoutes from './pedidos.js';
 import reportesRoutes from './reportes.js';
+import configRoutes from './config.js';
 
 const router = Router();
 
 // Rutas públicas
 router.use('/auth', authRoutes);
 router.use('/productos', productosRoutes);
+router.use('/configuracion-general', configRoutes);
 
 // Rutas protegidas
 router.use('/carrito', carritoRoutes);
@@ -28,6 +30,11 @@ router.get('/', (req, res) => {
         register: 'POST /v1/auth/register',
         login: 'POST /v1/auth/login',
         profile: 'GET /v1/auth/profile (protected)',
+        updateProfile: 'PUT /v1/auth/profile (protected)',
+      },
+      configuracion: {
+        get: 'GET /v1/configuracion-general',
+        update: 'PUT /v1/configuracion-general (admin)',
       },
       productos: {
         list: 'GET /v1/productos',

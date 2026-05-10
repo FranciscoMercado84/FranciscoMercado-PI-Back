@@ -34,8 +34,7 @@ describe('Productos API - Gestión de Imágenes', () => {
       nombre: 'Producto con Imagen',
       precio: 10,
       categoria: 'Panadería',
-      descripcion: 'Producto de prueba',
-      stock: 50
+      descripcion: 'Producto de prueba'
     });
     productoId = producto._id.toString();
   });
@@ -96,6 +95,17 @@ describe('Productos API - Gestión de Imágenes', () => {
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
+    });
+
+    it('debe permitir filtrar productos no disponibles', async () => {
+      const response = await request(app)
+        .get('/v1/productos?disponible=false');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      response.body.data.forEach(producto => {
+        expect(producto.disponible).toBe(false);
+      });
     });
 
     it('debe ordenar productos por precio descendente', async () => {

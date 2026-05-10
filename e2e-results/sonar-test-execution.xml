@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="C:/Users/paco8/Documents/GitHub/FranciscoMercado-PI-Back/tests/e2e/api.e2e.spec.js">
+    <testCase name="api api.e2e.spec.js Health + Register + Login API flow" duration="744"></testCase>
+  </file>
+</testExecutions>

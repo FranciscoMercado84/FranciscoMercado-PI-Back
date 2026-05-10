@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['tests/**/*.test.js'],
+    exclude: ['tests/e2e/**'],
     testTimeout: 30000,
     hookTimeout: 30000,
     fileParallelism: false,

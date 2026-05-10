@@ -1,0 +1,6 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="4.128843999999999">
+<testsuite name="api.e2e.spec.js" timestamp="2026-05-10T19:05:12.684Z" hostname="api" tests="1" failures="0" skipped="0" time="0.744" errors="0">
+<testcase name="Health + Register + Login API flow" classname="api.e2e.spec.js" time="0.744">
+</testcase>
+</testsuite>
+</testsuites>

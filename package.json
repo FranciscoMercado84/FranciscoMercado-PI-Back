@@ -10,8 +10,11 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
-    "test:report": "npx sonar-scanner",
+    "test:report": "node scripts/run-sonar-scanner.js",
+    "e2e": "npx playwright test",
+    "e2e:junit": "npx playwright test",
     "test:ci": "npm run test:coverage && npm run test:report",
+    "scan": "npm run test:coverage && npm run e2e:junit && npm run test:report",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "seed": "node scripts/seed.js",
@@ -33,7 +36,9 @@
     "globals": "^16.5.0",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4",
-    "vitest": "^4.0.12"
+    "vitest": "^4.0.12",
+    "@playwright/test": "^1.37.0",
+    "playwright": "^1.37.0"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

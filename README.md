@@ -443,6 +443,8 @@ Respuesta esperada:
 | **Producción** | `npm start` | Inicia el servidor en modo producción |
 | **Tests** | `npm test` | Ejecuta todos los tests con Vitest |
 | **Coverage** | `npm run test:coverage` | Genera reporte de cobertura de tests |
+| **E2E** | `npm run e2e:junit` | Ejecuta Playwright y genera reportes para SonarQube |
+| **Scan** | `npm run scan` | Ejecuta cobertura, E2E y SonarQube en un solo paso |
 | **Lint** | `npm run lint` | Ejecuta ESLint para verificar código |
 | **Lint Fix** | `npm run lint:fix` | Corrige automáticamente problemas de ESLint |
 | **Seed** | `npm run seed` | Pobla la base de datos con datos de prueba |
@@ -718,6 +720,26 @@ const email = generateUniqueEmail();
 Los reportes de cobertura se generan en `coverage/`:
 - `coverage/index.html` - Reporte visual en HTML
 - `coverage/lcov.info` - Formato LCOV para SonarQube
+
+### Escaneo Repetible
+
+Para escanear el proyecto siempre que quieras, usa:
+
+```bash
+npm run scan
+```
+
+Ese comando ejecuta, en este orden:
+
+1. `npm run test:coverage`
+2. `npm run e2e:junit`
+3. `npm run test:report`
+
+Si solo quieres relanzar SonarQube con los reportes ya generados:
+
+```bash
+npm run test:report
+```
 
 ### Usuarios de Prueba
 
